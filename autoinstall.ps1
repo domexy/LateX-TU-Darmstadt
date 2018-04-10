@@ -122,8 +122,8 @@ if( $install_miktex -eq $True){
     Expand-Archive "$name_miktex.zip"
 
     # downloading and installing Miktex
-    miktex-setup/miktexsetup --verbose --local-package-repository=C:\temp\miktex --package-set=complete download;
-    miktex-setup/miktexsetup --verbose --local-package-repository=C:\temp\miktex --shared --user-config="<APPDATA>\MiKTeX\2.9" --user-data="<LOCALAPPDATA>\MiKTeX\2.9" --user-install="<APPDATA>\MiKTeX\2.9" --user-roots=$tu_class_dir --print-info-only install;
+    miktex-setup/miktexsetup --verbose --local-package-repository="<APPDATA>\local\temp\miktex" --package-set=complete download;
+    miktex-setup/miktexsetup --verbose --local-package-repository="<APPDATA>\local\temp\miktex" --shared --user-config="<APPDATA>\MiKTeX\2.9" --user-data="<LOCALAPPDATA>\MiKTeX\2.9" --user-install="<APPDATA>\MiKTeX\2.9" --user-roots=$tu_class_dir --print-info-only install;
 }else{
 
 write-host "starting mo_admin"  -foreground "yellow"
