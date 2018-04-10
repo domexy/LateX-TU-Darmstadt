@@ -51,6 +51,44 @@ function Is-Installed( $program ) {
 # Main Program 
 #----------------------------
 
+#---Get Administrator permissions if not already present---
+
+# Get the ID and security principal of the current user account
+$myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
+$myWindowsPrincipal=new-object System.Security.Principal.WindowsPrincipal($myWindowsID)
+ 
+# Get the security principal for the Administrator role
+$adminRole=[System.Security.Principal.WindowsBuiltInRole]::Administrator
+ 
+# Check to see if we are currently running "as Administrator"
+if ($myWindowsPrincipal.IsInRole($adminRole))
+   {
+   # We are running "as Administrator" - so change the title and background color to indicate this
+   $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + "(Elevated)"
+   $Host.UI.RawUI.BackgroundColor = "DarkBlue"
+   clear-host
+   }
+else
+   {
+   # We are not running "as Administrator" - so relaunch as administrator
+   
+   # Create a new process object that starts PowerShell
+   $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
+   
+   # Specify the current script path and name as a parameter
+   $newProcess.Arguments = $myInvocation.MyCommand.Definition;
+   
+   # Indicate that the process should be elevated
+   $newProcess.Verb = "runas";
+   
+   # Start the new process
+   [System.Diagnostics.Process]::Start($newProcess);
+   
+   # Exit from the current, unelevated, process
+   exit
+   }
+
+#---Start logging---
 $ErrorActionPreference="SilentlyContinue"
 Stop-Transcript | out-null
 $ErrorActionPreference = "Continue"
@@ -119,11 +157,11 @@ if( $install_miktex -eq $True){
         download -url $link_miktex_x86 -dl_name $name_miktex
     }
     # unpacking Miktex setup
-    Expand-Archive "$name_miktex.zip"
+    Expand-Archive "$name_miktex.zip" -Force
 
     # downloading and installing Miktex
-    miktex-setup/miktexsetup --verbose --local-package-repository="<APPDATA>\local\temp\miktex" --package-set=complete download;
-    miktex-setup/miktexsetup --verbose --local-package-repository="<APPDATA>\local\temp\miktex" --shared --user-config="<APPDATA>\MiKTeX\2.9" --user-data="<LOCALAPPDATA>\MiKTeX\2.9" --user-install="<APPDATA>\MiKTeX\2.9" --user-roots=$tu_class_dir --print-info-only install;
+    .\miktex-setup\miktexsetup --verbose --local-package-repository=C:\temp\miktex --package-set=complete download;
+    .\miktex-setup\miktexsetup --verbose --local-package-repository=C:\temp\miktex --shared --user-config="<APPDATA>\MiKTeX\2.9" --user-data="<LOCALAPPDATA>\MiKTeX\2.9" --user-install="<APPDATA>\MiKTeX\2.9" --user-roots=$tu_class_dir --print-info-only install;
 }else{
 
 write-host "starting mo_admin"  -foreground "yellow"
