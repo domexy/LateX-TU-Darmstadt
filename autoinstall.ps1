@@ -51,11 +51,16 @@ function Is-Installed( $program ) {
 # Main Program 
 #----------------------------
 
+$ErrorActionPreference="SilentlyContinue"
+Stop-Transcript | out-null
+$ErrorActionPreference = "Continue"
+Start-Transcript -path .\autoinstall_log.txt -append
+
 #---Define scope of program---
 # Installing classes only or necessary programs also
 
 Write-Host "
-[1] (Re-)Install MikTex, TeXWorks and TU-Darmstadt classes
+[1] (Re-)Install MikTex, TeXWorks and TU-Darmstadt classes [recommended]
 [2] Install MikTex, TeXWorks (if missing) and TU-Darmstadt classes
 [3] Only install TU-Darmstadt classes"  -foreground "yellow"
 $valid_selection = $False;
@@ -105,12 +110,12 @@ if( $force_install_programs -eq $False){
 # Installing Miktex
 # Downloading Miktex setup
 if( $install_miktex -eq $True){
-    Write-Host "Installing MikteX"
+    Write-Host "Installing MikteX" -NoNewline
     if($isWin64 -eq $True){
-        Write-Host " 64bit" -NoNewline
+        Write-Host " 64bit"
         download -url $link_miktex_x64 -dl_name $name_miktex
     }else{
-        Write-Host " 32bit" -NoNewline
+        Write-Host " 32bit"
         download -url $link_miktex_x86 -dl_name $name_miktex
     }
     # unpacking Miktex setup
@@ -242,3 +247,5 @@ if ((Get-Command "pdflatex.exe" -ErrorAction SilentlyContinue) -eq $null)
 
 write-host "installation complete" -foreground "green"
 Read-Host -Prompt "Press Enter to Exit"
+
+Stop-Transcript
